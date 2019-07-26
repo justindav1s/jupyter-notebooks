@@ -1,0 +1,39 @@
+FROM centos/python-36-centos7:latest
+
+USER root
+
+COPY . /tmp/src
+
+RUN rm -rf /tmp/src/.git* && \
+    chown -R 1001 /tmp/src && \
+    chgrp -R 0 /tmp/src && \
+    chmod -R g+w /tmp/src && \
+    rm -rf /tmp/scripts && \
+    mv /tmp/src/.s2i/bin /tmp/scripts
+
+
+LABEL io.k8s.description="S2I builder for custom Jupyter notebooks." \
+      io.k8s.display-name="Jupyter Notebook" \
+      io.openshift.expose-services="8080:http" \
+      io.openshift.tags="builder,jupyter" \
+      io.openshift.s2i.scripts-url="image:///opt/app-root/builder"
+
+RUN rpm -ivh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+RUN yum update -y
+RUN yum -y groupinstall "Development Tools"
+RUN yum install -y pciutils dkms kernel-devel
+RUN yum install -y wget
+
+# https://developer.nvidia.com/cuda-downloads?target_os=Linux&target_arch=x86_64&target_distro=RHEL&target_version=7&target_type=rpmlocal
+RUN wget https://developer.nvidia.com/compute/cuda/10.1/Prod/local_installers/cuda-repo-rhel7-10-1-local-10.1.168-418.67-1.0-1.x86_64.rpm
+RUN rpm -i cuda-repo-rhel7-10-1-local-10.1.168-418.67-1.0-1.x86_64.rpm
+RUN yum clean all
+RUN yum -y install cuda
+
+USER 1001
+
+RUN /tmp/scripts/assemble
+
+
+
+CMD [ "/opt/app-root/builder/run" ]
