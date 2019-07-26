@@ -30,8 +30,10 @@ RUN rpm -i cuda-repo-rhel7-10-1-local-10.1.168-418.67-1.0-1.x86_64.rpm
 RUN yum clean all
 RUN yum -y install cuda
 
+USER 1001
+
 RUN /tmp/scripts/assemble
 
-USER 1001
+
 
 CMD [ "/opt/app-root/builder/run" ]
