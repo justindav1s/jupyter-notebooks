@@ -19,4 +19,3 @@ oc process -f docker-build-template.yml \
     | oc apply -n ${dev_project} -f -
 
 
-oc start-build ${app_name}-docker-build --follow -n ${dev_project} || true
