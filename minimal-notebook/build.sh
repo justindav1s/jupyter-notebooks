@@ -13,7 +13,7 @@ oc delete bc ${app_name}-docker-build
 oc process -f docker-build-template.yml \
     -p APPLICATION_NAME=${app_name} \
     -p SOURCE_REPOSITORY_URL=${git_url} \
-    -p SOURCE_REPOSITORY_REF="2.2.2" \
+    -p SOURCE_REPOSITORY_REF=master \
     -p DOCKERFILE_PATH=${app_name} \
     -p DOCKERFILE_NAME=Dockerfile-py36 \
     | oc apply -n ${dev_project} -f -
